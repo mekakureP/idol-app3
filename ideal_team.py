@@ -2,6 +2,14 @@ import os
 import pandas as pd
 import streamlit as st
 
+def get_font_size_for_idol(idol_name):
+    # 特定のアイドル名に例外を設定
+    exceptions = {
+        "イヴ・サンタクロース": 11,
+    }
+    # 例外がない場合はデフォルトサイズを使用
+    return exceptions.get(idol_name, 14) 
+
 def ideal_team_app(csv_file, ideal_team_file):
     # CSVファイルの読み込み
     if os.path.exists(csv_file):
@@ -89,7 +97,7 @@ def ideal_team_app(csv_file, ideal_team_file):
                         if os.path.exists(image_path):
                             st.image(image_path, width=100, use_container_width=False)
 
-                            # カード名、アイドル名、特化・秒数を表示
+                            # アイドル名と秒数を表示（左寄せで改行対応）
                             st.markdown(
                                 f"""
                                 <div style="text-align: left; margin: 0;">
@@ -98,7 +106,7 @@ def ideal_team_app(csv_file, ideal_team_file):
                                         {idol["カード名"]}
                                     </p>
                                     <!-- アイドル名 -->
-                                    <p style="font-size: 14px; margin: 0;">
+                                    <p style="font-size: {get_font_size_for_idol(idol['アイドル名'])}px; margin: 0;">
                                         {idol["アイドル名"]}
                                     </p>
                                     <!-- 特化と秒数 -->
