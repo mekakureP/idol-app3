@@ -92,7 +92,7 @@ def ideal_team_app(csv_file, ideal_team_file):
                             # アイドル名と秒数を表示（左寄せで改行対応）
                             st.markdown(
                                 f"""
-                                <p style="text-align: left; margin: 0; font-size: 12px;">
+                                <p style="text-align: left; margin: 0; font-size: 8px;">
                                     {idol["アイドル名"].replace("<br>", "<br />")}<br>
                                     <span style="background-color: black; color: white; padding: 2px; margin-top: 4px; display: inline-block;">
                                         {idol["特化"]} / {idol["秒数"]}秒
