@@ -59,7 +59,10 @@ def ideal_team_app(csv_file, ideal_team_file):
             with cols[i]:
                 # スキルを表示（スキル名のみ）
                 if skill_info["スキル"]:
-                    st.markdown(f"<p style='text-align: left; font-weight: bold;'>{skill_info['スキル']}</p>", unsafe_allow_html=True)
+                    st.markdown(
+                        f"<p style='text-align: left; font-weight: bold; font-size: 14px;'>{skill_info['スキル']}</p>",
+                        unsafe_allow_html=True
+                    )
 
                 # フィルタリング条件を生成
                 filtered_df = df.copy()
