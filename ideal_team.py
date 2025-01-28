@@ -60,7 +60,7 @@ def ideal_team_app(csv_file, ideal_team_file):
                 # スキルを表示（スキル名のみ）
                 if skill_info["スキル"]:
                     st.markdown(
-                        f"<p style='text-align: left; font-weight: bold; font-size: 9px;'>{skill_info['スキル']}</p>",
+                        f"<p style='text-align: left; font-weight: bold; font-size: 8.5px;'>{skill_info['スキル']}</p>",
                         unsafe_allow_html=True
                     )
 
