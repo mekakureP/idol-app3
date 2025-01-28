@@ -89,15 +89,23 @@ def ideal_team_app(csv_file, ideal_team_file):
                         if os.path.exists(image_path):
                             st.image(image_path, width=100, use_container_width=False)
 
-                            # アイドル名と秒数を表示（左寄せで改行対応）
+                            # カード名、アイドル名、特化・秒数を表示
                             st.markdown(
                                 f"""
-                                <p style="text-align: left; margin: 0; font-size: 8px;">
-                                    {idol["アイドル名"].replace("<br>", "<br />")}<br>
+                                <div style="text-align: left; margin: 0;">
+                                    <!-- カード名 -->
+                                    <p style="font-size: 12px; margin: 0; margin-bottom: 4px;">
+                                        {idol["カード名"]}
+                                    </p>
+                                    <!-- アイドル名 -->
+                                    <p style="font-size: 12px; margin: 0; margin-bottom: 4px;">
+                                        {idol["アイドル名"]}
+                                    </p>
+                                    <!-- 特化と秒数 -->
                                     <span style="background-color: black; color: white; padding: 2px; margin-top: 4px; display: inline-block; font-size: 8.5px;">
                                         {idol["特化"]} / {idol["秒数"]}秒
                                     </span>
-                                </p>
+                                </div>
                                 """,
                                 unsafe_allow_html=True,
                             )
@@ -105,4 +113,3 @@ def ideal_team_app(csv_file, ideal_team_file):
                             st.error(f"画像が見つかりません: {image_path}")
                 else:
                     st.write("該当するアイドルがいません")
-
