@@ -40,7 +40,7 @@ def idol_skill_app(idol_list_path, skill_info_path):
             options=sorted(df["秒数"].unique()),
             default=[]
         )
-        selected_seconds = st.multiselect(
+        selected_idols = st.multiselect(
             "アイドル名で絞り込む",
             options=sorted(df["アイドル名"].unique()),
             default=[]
@@ -61,6 +61,9 @@ def idol_skill_app(idol_list_path, skill_info_path):
 
     if selected_seconds:
         filtered_df = filtered_df[filtered_df["秒数"].isin(selected_seconds)]
+
+    if selected_idols:
+        filtered_df = filtered_df[filtered_df["アイドル名"].isin(selected_idols)]
 
     # 属性の表示順を設定
     attribute_order = {"Cu": 0, "Co": 1, "Pa": 2}
