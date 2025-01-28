@@ -70,6 +70,14 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
     if selected_idols:
         filtered_df = filtered_df[filtered_df["アイドル名"].isin(selected_idols)]
 
+    # 特化ラベルの設定
+    default_columns = ["ボーカル", "ダンス", "ビジュアル"]
+    default_colors = {"ボーカル": "#ffe4e1", "ダンス": "#add8e6", "ビジュアル": "#ffffe0"}
+    custom_vertical_axes = {
+        "ドミナント・ハーモニー": ["ボーカル&ダンス", "ダンス&ビジュアル", "ビジュアル&ボーカル"],
+        "ミューチャル": ["ボーカル&ダンス", "ダンス&ビジュアル", "ビジュアル&ボーカル"]
+    }
+
     # スキルごとにテーブルを表示
     for skill in filtered_df["スキル"].unique():
         skill_df = filtered_df[filtered_df["スキル"] == skill]
@@ -85,6 +93,17 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
                 f"<p style='font-size: 20px; font-style: italic; color: gray;'>{skill_detail[0]}</p>",
                 unsafe_allow_html=True,
             )
+
+        # 特化ステータス例外の適用
+        columns = custom_vertical_axes.get(skill, default_columns)
+
+        # 特化ラベルを一度だけ表示
+        st.markdown(
+            f"<div style='display: flex; justify-content: space-around; padding: 10px; background-color: #f5f5f5; border-radius: 5px;'>"
+            + "".join([f"<div style='background-color: {default_colors.get(col, '#ffffff')}; padding: 5px; text-align: center;'>{col}</div>" for col in columns])
+            + "</div>",
+            unsafe_allow_html=True,
+        )
 
         # 詳細情報を表示
         for _, idol in skill_df.iterrows():
