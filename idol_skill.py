@@ -2,15 +2,16 @@ import os
 import pandas as pd
 import streamlit as st
 
-def idol_skill_app(idol_list_path, skill_info_path):
+def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
     # CSVファイルの読み込み
-    if not idol_list_path or not skill_info_path:
+    if not idol_list_path or not skill_info_path or not idol_name_path:
         st.error("ファイルパスが指定されていません！")
         return
 
     try:
         df = pd.read_csv(idol_list_path, encoding="shift_jis")
         skill_info_df = pd.read_csv(skill_info_path, encoding="shift_jis")
+        idol_name_df = pd.read_csv(idol_name_path, encoding="shift_jis")
     except FileNotFoundError as e:
         st.error(f"{e.filename} が見つかりません！")
         return
@@ -40,9 +41,9 @@ def idol_skill_app(idol_list_path, skill_info_path):
             options=sorted(df["秒数"].unique()),
             default=[]
         )
-        selected_idols = st.multiselect(
+        selected_idol_names = st.multiselect(
             "アイドル名で絞り込む",
-            options=sorted(df["アイドル名"].unique()),
+            options=sorted(idol_name_df["アイドル名"].unique()),
             default=[]
         )
 
@@ -62,8 +63,12 @@ def idol_skill_app(idol_list_path, skill_info_path):
     if selected_seconds:
         filtered_df = filtered_df[filtered_df["秒数"].isin(selected_seconds)]
 
-    if selected_idols:
-        filtered_df = filtered_df[filtered_df["アイドル名"].isin(selected_idols)]
+    if selected_idol_names:
+        filtered_df = filtered_df[filtered_df["アイドル名"].isin(selected_idol_names)]
+
+    # 五十音順ソートの準備
+    filtered_df = filtered_df.merge(idol_name_df[["アイドル名", "あいどるめい"]], on="アイドル名", how="left")
+    filtered_df = filtered_df.sort_values(by="あいどるめい")
 
     # 属性の表示順を設定
     attribute_order = {"Cu": 0, "Co": 1, "Pa": 2}
