@@ -8,7 +8,7 @@ def get_font_size_for_idol(idol_name):
         "イヴ・サンタクロース": 11,
     }
     # 例外がない場合はデフォルトサイズを使用
-    return exceptions.get(idol_name, 14) 
+    return exceptions.get(idol_name, 14)
 
 def ideal_team_app(csv_file, ideal_team_file):
     # CSVファイルの読み込み
@@ -59,7 +59,14 @@ def ideal_team_app(csv_file, ideal_team_file):
         col_labels = st.columns(len(labels))
         for i, label in enumerate(labels):
             with col_labels[i]:
-                st.markdown(f"<h4 style='text-align: center;'>{label}</h4>", unsafe_allow_html=True)
+                st.markdown(
+                    f"""
+                    <h4 style='text-align: center; margin-bottom: 8px;'>  <!-- ラベルの間隔を狭める -->
+                        {label}
+                    </h4>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
         # 各スキルに該当するアイドルを表示
         cols = st.columns(len(skills))
@@ -68,8 +75,12 @@ def ideal_team_app(csv_file, ideal_team_file):
                 # スキルを表示（スキル名のみ）
                 if skill_info["スキル"]:
                     st.markdown(
-                        f"<p style='text-align: left; font-weight: bold; font-size: 8.5px;'>{skill_info['スキル']}</p>",
-                        unsafe_allow_html=True
+                        f"""
+                        <p style='text-align: left; font-weight: bold; font-size: 8.5px; margin-top: 4px; margin-bottom: 4px;'>  <!-- スキルラベルの間隔を調整 -->
+                            {skill_info['スキル']}
+                        </p>
+                        """,
+                        unsafe_allow_html=True,
                     )
 
                 # フィルタリング条件を生成
