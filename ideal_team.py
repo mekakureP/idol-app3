@@ -61,7 +61,7 @@ def ideal_team_app(csv_file, ideal_team_file):
             with col_labels[i]:
                 st.markdown(
                     f"""
-                    <h4 style='text-align: center; margin-bottom: 8px;'>  <!-- ラベルの間隔を狭める -->
+                    <h4 style='text-align: center; margin-bottom: 2px;'>  <!-- ラベルの間隔を狭める -->
                         {label}
                     </h4>
                     """,
