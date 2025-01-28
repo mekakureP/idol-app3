@@ -19,6 +19,10 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
     # Streamlitアプリタイトル
     st.title("アイドル管理システム")
 
+    # アイドル名を五十音順に並べ替え
+    idol_name_df = idol_name_df.sort_values("あいどるめい")
+    idol_name_options = idol_name_df["アイドル名"].tolist()
+
     # フィルタリングセクション
     st.subheader("絞り込み条件を選択してください")
     col1, col2 = st.columns(2)
@@ -41,9 +45,9 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
             options=sorted(df["秒数"].unique()),
             default=[]
         )
-        selected_idol_names = st.multiselect(
+        selected_idols = st.multiselect(
             "アイドル名で絞り込む",
-            options=sorted(idol_name_df["アイドル名"].unique()),
+            options=idol_name_options,
             default=[]
         )
 
@@ -63,32 +67,15 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
     if selected_seconds:
         filtered_df = filtered_df[filtered_df["秒数"].isin(selected_seconds)]
 
-    if selected_idol_names:
-        filtered_df = filtered_df[filtered_df["アイドル名"].isin(selected_idol_names)]
-
-    # 五十音順ソートの準備
-    filtered_df = filtered_df.merge(idol_name_df[["アイドル名", "あいどるめい"]], on="アイドル名", how="left")
-    filtered_df = filtered_df.sort_values(by="あいどるめい")
-
-    # 属性の表示順を設定
-    attribute_order = {"Cu": 0, "Co": 1, "Pa": 2}
-    filtered_df["属性順"] = filtered_df["属性"].map(attribute_order)
-
-    # デフォルトの特化列名
-    default_columns = ["ボーカル", "ダンス", "ビジュアル"]
-    default_colors = {"ボーカル": "#ffe4e1", "ダンス": "#add8e6", "ビジュアル": "#ffffe0"}
-
-    # 特化ステータス例外
-    custom_vertical_axes = {
-        "ドミナント・ハーモニー": ["ボーカル&ダンス", "ダンス&ビジュアル", "ビジュアル&ボーカル"],
-        "ミューチャル": ["ボーカル&ダンス", "ダンス&ビジュアル", "ビジュアル&ボーカル"]
-    }
-
-    # 確率の並び順
-    probability_order = {"低": 0, "中": 1, "高": 2}
+    if selected_idols:
+        filtered_df = filtered_df[filtered_df["アイドル名"].isin(selected_idols)]
 
     # スキルごとにテーブルを表示
     for skill in filtered_df["スキル"].unique():
+        skill_df = filtered_df[filtered_df["スキル"] == skill]
+        if skill_df.empty:
+            continue
+
         st.markdown(f"### スキル: {skill}")
 
         # スキル詳細を取得
@@ -99,83 +86,43 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
                 unsafe_allow_html=True,
             )
 
-        skill_df = filtered_df[filtered_df["スキル"] == skill].copy()
+        # 詳細情報を表示
+        for _, idol in skill_df.iterrows():
+            image_path = idol["画像パス"]
+            if os.path.exists(image_path):
+                st.image(image_path, width=100, use_container_width=False)
 
-        # 特化ステータス例外の適用
-        columns = custom_vertical_axes.get(skill, default_columns)
-
-        # 秒数確率で並べ替え
-        skill_df["秒数確率"] = skill_df["秒数"].astype(str) + skill_df["確率"]
-        skill_df["確率ソート"] = skill_df["確率"].map(probability_order)
-        seconds_probs = sorted(
-            skill_df["秒数確率"].dropna().unique(),
-            key=lambda x: (int(x[:-1]), probability_order.get(x[-1], 0))
-        )
-
-        if not skill_df.empty:
-            # 特化ラベルを一度だけ表示
-            st.markdown(
-                f"<div style='display: flex; justify-content: space-around; padding: 10px; background-color: #f5f5f5; border-radius: 5px;'>"
-                + "".join([f"<div style='background-color: {default_colors.get(col, '#ffffff')}; padding: 5px; text-align: center;'>{col}</div>" for col in columns])
-                + "</div>",
-                unsafe_allow_html=True,
-            )
-
-            # 秒数ごとにデータを取得し横並び
-            for sec_prob in seconds_probs:
+                # カード名とアイドル名を表示
                 st.markdown(
                     f"""
-                    <p style="font-size: 30px; font-weight: bold; color: black; margin: 10px 0;">
-                        秒数: {sec_prob}
-                    </p>
+                    <div style="text-align: left; margin: 0;">
+                        <!-- カード名 -->
+                        <p style="font-size: 12px; margin: 0;">
+                            {idol["カード名"]}
+                        </p>
+                        <!-- アイドル名 -->
+                        <p style="font-size: 14px; margin: 0;">
+                            {idol["アイドル名"]}
+                        </p>
+                    </div>
                     """,
                     unsafe_allow_html=True,
                 )
-                cols = st.columns(len(columns))
-                for i, col_name in enumerate(columns):
-                    with cols[i]:
-                        # 特化ごとのアイドルを表示
-                        idols = skill_df[(skill_df["秒数確率"] == sec_prob) & (skill_df["特化"] == col_name)]
-                        if not idols.empty:
-                            idols = idols.sort_values(by="属性順")  # 属性順でソート
-                            for _, idol in idols.iterrows():
-                                image_path = idol["画像パス"]
-                                if os.path.exists(image_path):
-                                    st.image(image_path, width=100, use_container_width=False)
 
-                                    # カード名とアイドル名を表示
-                                    st.markdown(
-                                        f"""
-                                        <div style="text-align: left; margin: 0;">
-                                            <!-- カード名 -->
-                                            <p style="font-size: 14px; margin: 0;">
-                                                {idol["カード名"]}
-                                            </p>
-                                            <!-- アイドル名 -->
-                                            <p style="font-size: 14px; margin: 0;">
-                                                {idol["アイドル名"]}
-                                            </p>
-                                        </div>
-                                        """,
-                                        unsafe_allow_html=True,
-                                    )
-
-                                    # 詳細情報を表示
-                                    with st.expander("詳細"):
-                                        st.write(f"**属性**: {idol['属性']}")
-                                        st.write(f"**特化**: {idol['特化']}")
-                                        st.write(f"**秒数**: {idol['秒数']} 秒")
-                                        st.write(f"**確率**: {idol['確率']}")
-                                        st.write(f"**スキル**: {idol['スキル']}")
-                                        st.write(f"**センター効果**: {idol['センター効果']}")
-                                        st.write(f"**Vo**: {idol['Vo']}")
-                                        st.write(f"**Da**: {idol['Da']}")
-                                        st.write(f"**Vi**: {idol['Vi']}")
-                                        st.write(f"**メモリアルガシャ**: {idol['メモリアルガシャ'] if pd.notna(idol['メモリアルガシャ']) else 'データなし'}")
-                                        if skill == "ドミナント・ハーモニー":
-                                            st.write(f"**副属性**: {idol['副属性']}")
-                                            st.write(f"**ドミナント**: {idol['ドミナント']}")
-                                else:
-                                    st.error(f"画像が見つかりません: {image_path}")
-                        else:
-                            st.write("該当するアイドルがいません")
+                # 詳細情報を表示
+                with st.expander("詳細"):
+                    st.write(f"**属性**: {idol['属性']}")
+                    st.write(f"**特化**: {idol['特化']}")
+                    st.write(f"**秒数**: {idol['秒数']} 秒")
+                    st.write(f"**確率**: {idol['確率']}")
+                    st.write(f"**スキル**: {idol['スキル']}")
+                    st.write(f"**センター効果**: {idol['センター効果']}")
+                    st.write(f"**Vo**: {idol['Vo']}")
+                    st.write(f"**Da**: {idol['Da']}")
+                    st.write(f"**Vi**: {idol['Vi']}")
+                    st.write(f"**メモリアルガシャ**: {idol['メモリアルガシャ'] if pd.notna(idol['メモリアルガシャ']) else 'データなし'}")
+                    if skill == "ドミナント・ハーモニー":
+                        st.write(f"**副属性**: {idol['副属性']}")
+                        st.write(f"**ドミナント**: {idol['ドミナント']}")
+            else:
+                st.error(f"画像が見つかりません: {image_path}")
