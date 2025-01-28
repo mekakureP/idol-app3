@@ -105,43 +105,49 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
             unsafe_allow_html=True,
         )
 
-        # 詳細情報を表示
-        for _, idol in skill_df.iterrows():
-            image_path = idol["画像パス"]
-            if os.path.exists(image_path):
-                st.image(image_path, width=100, use_container_width=False)
+        # 特化ごとにアイドルを表示（横3列配置）
+        cols = st.columns(len(columns))
+        for i, col_name in enumerate(columns):
+            with cols[i]:
+                idols = skill_df[skill_df["特化"] == col_name]
+                if not idols.empty:
+                    idols = idols.sort_values(by="属性順")  # 属性順でソート
+                    for _, idol in idols.iterrows():
+                        image_path = idol["画像パス"]
+                        if os.path.exists(image_path):
+                            st.image(image_path, width=100, use_container_width=False)
 
-                # カード名とアイドル名を表示
-                st.markdown(
-                    f"""
-                    <div style="text-align: left; margin: 0;">
-                        <!-- カード名 -->
-                        <p style="font-size: 12px; margin: 0;">
-                            {idol["カード名"]}
-                        </p>
-                        <!-- アイドル名 -->
-                        <p style="font-size: 14px; margin: 0;">
-                            {idol["アイドル名"]}
-                        </p>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+                            # カード名とアイドル名を表示
+                            st.markdown(
+                                f"""
+                                <div style="text-align: left; margin: 0;">
+                                    <!-- カード名 -->
+                                    <p style="font-size: 12px; margin: 0;">
+                                        {idol["カード名"]}
+                                    </p>
+                                    <!-- アイドル名 -->
+                                    <p style="font-size: 14px; margin: 0;">
+                                        {idol["アイドル名"]}
+                                    </p>
+                                </div>
+                                """,
+                                unsafe_allow_html=True,
+                            )
 
-                # 詳細情報を表示
-                with st.expander("詳細"):
-                    st.write(f"**属性**: {idol['属性']}")
-                    st.write(f"**特化**: {idol['特化']}")
-                    st.write(f"**秒数**: {idol['秒数']} 秒")
-                    st.write(f"**確率**: {idol['確率']}")
-                    st.write(f"**スキル**: {idol['スキル']}")
-                    st.write(f"**センター効果**: {idol['センター効果']}")
-                    st.write(f"**Vo**: {idol['Vo']}")
-                    st.write(f"**Da**: {idol['Da']}")
-                    st.write(f"**Vi**: {idol['Vi']}")
-                    st.write(f"**メモリアルガシャ**: {idol['メモリアルガシャ'] if pd.notna(idol['メモリアルガシャ']) else 'データなし'}")
-                    if skill == "ドミナント・ハーモニー":
-                        st.write(f"**副属性**: {idol['副属性']}")
-                        st.write(f"**ドミナント**: {idol['ドミナント']}")
-            else:
-                st.error(f"画像が見つかりません: {image_path}")
+                            # 詳細情報を表示
+                            with st.expander("詳細"):
+                                st.write(f"**属性**: {idol['属性']}")
+                                st.write(f"**特化**: {idol['特化']}")
+                                st.write(f"**秒数**: {idol['秒数']} 秒")
+                                st.write(f"**確率**: {idol['確率']}")
+                                st.write(f"**スキル**: {idol['スキル']}")
+                                st.write(f"**センター効果**: {idol['センター効果']}")
+                                st.write(f"**Vo**: {idol['Vo']}")
+                                st.write(f"**Da**: {idol['Da']}")
+                                st.write(f"**Vi**: {idol['Vi']}")
+                                st.write(f"**メモリアルガシャ**: {idol['メモリアルガシャ'] if pd.notna(idol['メモリアルガシャ']) else 'データなし'}")
+                                if skill == "ドミナント・ハーモニー":
+                                    st.write(f"**副属性**: {idol['副属性']}")
+                                    st.write(f"**ドミナント**: {idol['ドミナント']}")
+                        else:
+                            st.error(f"画像が見つかりません: {image_path}")
