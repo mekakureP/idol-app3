@@ -147,7 +147,7 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
                                         f"""
                                         <div style="text-align: left; margin: 0;">
                                             <!-- カード名 -->
-                                            <p style="font-size: 12px; margin: 0;">
+                                            <p style="font-size: 14px; margin: 0;">
                                                 {idol["カード名"]}
                                             </p>
                                             <!-- アイドル名 -->
