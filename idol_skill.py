@@ -40,6 +40,11 @@ def idol_skill_app(idol_list_path, skill_info_path):
             options=sorted(df["秒数"].unique()),
             default=[]
         )
+        selected_seconds = st.multiselect(
+            "アイドル名で絞り込む",
+            options=sorted(df["アイドル名"].unique()),
+            default=[]
+        )
 
     # フィルタリング処理
     filtered_df = df.copy()
