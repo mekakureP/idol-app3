@@ -94,11 +94,11 @@ def ideal_team_app(csv_file, ideal_team_file):
                                 f"""
                                 <div style="text-align: left; margin: 0;">
                                     <!-- カード名 -->
-                                    <p style="font-size: 8px; margin: 0; margin-bottom: 0px;">
+                                    <p style="font-size: 8px; margin: 0;">
                                         {idol["カード名"]}
                                     </p>
                                     <!-- アイドル名 -->
-                                    <p style="font-size: 14px; margin: 0">
+                                    <p style="font-size: 14px; margin: 0;">
                                         {idol["アイドル名"]}
                                     </p>
                                     <!-- 特化と秒数 -->
