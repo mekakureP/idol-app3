@@ -94,7 +94,7 @@ def ideal_team_app(csv_file, ideal_team_file):
                                 f"""
                                 <p style="text-align: left; margin: 0; font-size: 8px;">
                                     {idol["アイドル名"].replace("<br>", "<br />")}<br>
-                                    <span style="background-color: black; color: white; padding: 2px; margin-top: 4px; display: inline-block;">
+                                    <span style="background-color: black; color: white; padding: 2px; margin-top: 4px; display: inline-block; font-size: 10px;">
                                         {idol["特化"]} / {idol["秒数"]}秒
                                     </span>
                                 </p>
