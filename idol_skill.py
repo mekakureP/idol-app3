@@ -16,6 +16,9 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
         st.error(f"{e.filename} が見つかりません！")
         return
 
+    # アイドル名の五十音順に基づくソート順を生成
+    sorted_idol_names = idol_name_df["アイドル名"].dropna().tolist()
+
     # Streamlitアプリタイトル
     st.title("アイドル管理システム")
 
@@ -43,7 +46,7 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
         )
         selected_idol_names = st.multiselect(
             "アイドル名で絞り込む",
-            options=idol_name_df.sort_values("あいどるめい")["アイドル名"].unique(),
+            options=[name for name in sorted_idol_names if name in df["アイドル名"].unique()],
             default=[]
         )
 
