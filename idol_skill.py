@@ -41,9 +41,9 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
             options=sorted(df["秒数"].unique()),
             default=[]
         )
-        selected_idols = st.multiselect(
+        selected_idol_names = st.multiselect(
             "アイドル名で絞り込む",
-            options=idol_name_df["アイドル名"].sort_values(key=lambda x: idol_name_df.loc[x.index, "あいどるめい"]).unique(),
+            options=idol_name_df.sort_values("あいどるめい")["アイドル名"].unique(),
             default=[]
         )
 
@@ -63,12 +63,12 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
     if selected_seconds:
         filtered_df = filtered_df[filtered_df["秒数"].isin(selected_seconds)]
 
-    if selected_idols:
-        filtered_df = filtered_df[filtered_df["アイドル名"].isin(selected_idols)]
+    if selected_idol_names:
+        filtered_df = filtered_df[filtered_df["アイドル名"].isin(selected_idol_names)]
 
     # 属性の表示順を設定
     attribute_order = {"Cu": 0, "Co": 1, "Pa": 2}
-    filtered_df["属性順"] = filtered_df["属性"].map(attribute_order).fillna(-1)
+    filtered_df["属性順"] = filtered_df["属性"].map(attribute_order)
 
     # デフォルトの特化列名
     default_columns = ["ボーカル", "ダンス", "ビジュアル"]
@@ -131,7 +131,7 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
                 for i, col_name in enumerate(columns):
                     with cols[i]:
                         # 特化ごとのアイドルを表示
-                        idols = skill_df[skill_df["特化"] == col_name]
+                        idols = skill_df[(skill_df["秒数確率"] == sec_prob) & (skill_df["特化"] == col_name)]
                         if not idols.empty:
                             idols = idols.sort_values(by="属性順")  # 属性順でソート
                             for _, idol in idols.iterrows():
