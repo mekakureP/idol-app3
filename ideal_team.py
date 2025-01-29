@@ -42,7 +42,14 @@ def ideal_team_app(csv_file, ideal_team_file):
 
     # 理想編成ごとに表示
     for _, row in ideal_team_df.iterrows():
-        st.markdown(f"### {row['編成名']} ({row['対応楽曲']})")
+        st.markdown(
+            f"""
+            <div style='margin-top: 10px; padding: 5px; background-color: black; color: white; text-align: center; font-size: 16px;'>
+                {row['編成名']} ({row['対応楽曲']})
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
         # スキルごとの列ラベル設定
         labels = ["センター", "アイドル2", "アイドル3", "アイドル4", "アイドル5", "ゲスト"]
@@ -61,7 +68,7 @@ def ideal_team_app(csv_file, ideal_team_file):
             with col_labels[i]:
                 st.markdown(
                     f"""
-                    <h4 style='text-align: center; margin-bottom: 2px;'>  <!-- ラベルの間隔を狭める -->
+                    <h4 style='text-align: center; margin-bottom: 2px;'>
                         {label}
                     </h4>
                     """,
@@ -76,7 +83,7 @@ def ideal_team_app(csv_file, ideal_team_file):
                 if skill_info["スキル"]:
                     st.markdown(
                         f"""
-                        <p style='text-align: left; font-weight: bold; font-size: 8.5px; margin-top: 4px; margin-bottom: 4px;'>  <!-- スキルラベルの間隔を調整 -->
+                        <p style='text-align: left; font-weight: bold; font-size: 8.5px; margin-top: 4px; margin-bottom: 4px;'>
                             {skill_info['スキル']}
                         </p>
                         """,
@@ -112,15 +119,12 @@ def ideal_team_app(csv_file, ideal_team_file):
                             st.markdown(
                                 f"""
                                 <div style="text-align: left; margin: 0;">
-                                    <!-- カード名 -->
                                     <p style="font-size: 8px; margin: 0;">
                                         {idol["カード名"]}
                                     </p>
-                                    <!-- アイドル名 -->
                                     <p style="font-size: {get_font_size_for_idol(idol['アイドル名'])}px; margin: 0;">
                                         {idol["アイドル名"]}
                                     </p>
-                                    <!-- 特化と秒数 -->
                                     <span style="background-color: black; color: white; padding: 2px; display: inline-block; font-size: 8.5px;">
                                         {idol["特化"]} / {idol["秒数"]}秒
                                     </span>
