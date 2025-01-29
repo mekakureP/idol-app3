@@ -44,7 +44,7 @@ def ideal_team_app(csv_file, ideal_team_file):
     for _, row in ideal_team_df.iterrows():
         st.markdown(
             f"""
-            <div style='margin-top: 10px; padding: 5px; background-color: black; color: white; text-align: center; font-size: 16px;'>
+            <div style='margin-top: 10px; padding: 5px; background-color: black; color: white; text-align: center; font-size: 20px;'>
                 {row['編成名']} ({row['対応楽曲']})
             </div>
             """,
