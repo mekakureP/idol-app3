@@ -166,6 +166,7 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
                                         st.write(f"**秒数**: {idol['秒数']} 秒")
                                         st.write(f"**確率**: {idol['確率']}")
                                         st.write(f"**スキル**: {idol['スキル']}")
+                                        st.write(f"**スキル名**: {idol['スキル名']}")
                                         st.write(f"**センター効果**: {idol['センター効果']}")
                                         st.write(f"**Vo**: {idol['Vo']}")
                                         st.write(f"**Da**: {idol['Da']}")
