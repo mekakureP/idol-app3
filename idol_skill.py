@@ -71,7 +71,7 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
 
     # 属性の表示順を設定
     attribute_order = {"Cu": 0, "Co": 1, "Pa": 2}
-    filtered_df["属性順"] = filtered_df["属性"].map(attribute_order)
+    filtered_df["属性順"] = filtered_df["属性"].map(attribute_order).fillna(99)
 
     # デフォルトの特化列名
     default_columns = ["ボーカル", "ダンス", "ビジュアル"]
@@ -106,16 +106,23 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
         # 秒数確率で並べ替え
         skill_df["秒数確率"] = skill_df["秒数"].astype(str) + skill_df["確率"]
         skill_df["確率ソート"] = skill_df["確率"].map(probability_order)
+        # 秒数と「低/中/高」の組み合わせでソート
         seconds_probs = sorted(
             skill_df["秒数確率"].dropna().unique(),
-            key=lambda x: (int(x[:-1]), probability_order.get(x[-1], 0))
+            key=lambda x: (
+                int(''.join(ch for ch in x if ch.isdigit())), 
+                probability_order.get(''.join(ch for ch in x if not ch.isdigit()), 0)
+            )
         )
 
         if not skill_df.empty:
             # 特化ラベルを一度だけ表示
             st.markdown(
                 f"<div style='display: flex; justify-content: space-around; padding: 10px; background-color: #f5f5f5; border-radius: 5px;'>"
-                + "".join([f"<div style='background-color: {default_colors.get(col, '#ffffff')}; padding: 5px; text-align: center;'>{col}</div>" for col in columns])
+                + "".join([
+                    f"<div style='background-color: {default_colors.get(col, '#ffffff')}; padding: 5px; text-align: center;'>{col}</div>"
+                    for col in columns
+                ])
                 + "</div>",
                 unsafe_allow_html=True,
             )
@@ -138,6 +145,9 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
                         if not idols.empty:
                             idols = idols.sort_values(by="属性順")  # 属性順でソート
                             for _, idol in idols.iterrows():
+                                # -----------------------------
+                                # 1) ローカル画像を表示（従来の処理）
+                                # -----------------------------
                                 image_path = idol["画像パス"]
                                 if os.path.exists(image_path):
                                     st.image(image_path, width=100, use_container_width=False)
@@ -158,24 +168,38 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
                                         """,
                                         unsafe_allow_html=True,
                                     )
-
-                                    # 詳細情報を表示
-                                    with st.expander("詳細"):
-                                        st.write(f"**属性**: {idol['属性']}")
-                                        st.write(f"**特化**: {idol['特化']}")
-                                        st.write(f"**秒数**: {idol['秒数']} 秒")
-                                        st.write(f"**確率**: {idol['確率']}")
-                                        st.write(f"**スキル**: {idol['スキル']}")
-                                        st.write(f"**スキル名**: {idol['スキル名']}")
-                                        st.write(f"**センター効果**: {idol['センター効果']}")
-                                        st.write(f"**Vo**: {idol['Vo']}")
-                                        st.write(f"**Da**: {idol['Da']}")
-                                        st.write(f"**Vi**: {idol['Vi']}")
-                                        st.write(f"**メモリアルガシャ**: {idol['メモリアルガシャ'] if pd.notna(idol['メモリアルガシャ']) else 'データなし'}")
-                                        if skill == "ドミナント・ハーモニー":
-                                            st.write(f"**副属性**: {idol['副属性']}")
-                                            st.write(f"**ドミナント**: {idol['ドミナント']}")
                                 else:
+                                    # ローカル画像が無い場合はエラーを出す
                                     st.error(f"画像が見つかりません: {image_path}")
+
+                                # -----------------------------
+                                # 2) 詳細情報（Expander内）に「画像URL」リンクを追加
+                                # -----------------------------
+                                with st.expander("詳細"):
+                                    st.write(f"**属性**: {idol['属性']}")
+                                    st.write(f"**特化**: {idol['特化']}")
+                                    st.write(f"**秒数**: {idol['秒数']} 秒")
+                                    st.write(f"**確率**: {idol['確率']}")
+                                    st.write(f"**スキル**: {idol['スキル']}")
+                                    st.write(f"**スキル名**: {idol['スキル名']}")
+                                    st.write(f"**センター効果**: {idol['センター効果']}")
+                                    st.write(f"**Vo**: {idol['Vo']}")
+                                    st.write(f"**Da**: {idol['Da']}")
+                                    st.write(f"**Vi**: {idol['Vi']}")
+                                    st.write(f"**メモリアルガシャ**: {idol['メモリアルガシャ'] if pd.notna(idol['メモリアルガシャ']) else 'データなし'}")
+
+                                    if skill == "ドミナント・ハーモニー":
+                                        st.write(f"**副属性**: {idol['副属性']}")
+                                        st.write(f"**ドミナント**: {idol['ドミナント']}")
+
+                                    # ▼▼▼ ここで画像URLのリンクを表示 ▼▼▼
+                                    # CSVファイルに "画像URL" カラムがある想定
+                                    image_url = idol.get("画像URL", None)
+                                    if pd.notna(image_url) and str(image_url).strip():
+                                        link_html = f'<a href="{image_url}" target="_blank">➔ 画像URLを開く</a>'
+                                        st.markdown(link_html, unsafe_allow_html=True)
+                                    else:
+                                        st.write("外部画像URLは設定されていません")
                         else:
                             st.write("該当するアイドルがいません")
+
