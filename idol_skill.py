@@ -106,12 +106,12 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
         # 秒数確率で並べ替え
         skill_df["秒数確率"] = skill_df["秒数"].astype(str) + skill_df["確率"]
         skill_df["確率ソート"] = skill_df["確率"].map(probability_order)
-        # 秒数と「低/中/高」の組み合わせでソート
+
         seconds_probs = sorted(
             skill_df["秒数確率"].dropna().unique(),
             key=lambda x: (
-                int(''.join(ch for ch in x if ch.isdigit())), 
-                probability_order.get(''.join(ch for ch in x if not ch.isdigit()), 0)
+                int(''.join(ch for ch in x if ch.isdigit())),  # 秒数部分を数値に
+                probability_order.get(''.join(ch for ch in x if not ch.isdigit()), 0)  # 低/中/高の並び
             )
         )
 
@@ -145,9 +145,9 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
                         if not idols.empty:
                             idols = idols.sort_values(by="属性順")  # 属性順でソート
                             for _, idol in idols.iterrows():
-                                # -----------------------------
-                                # 1) ローカル画像を表示（従来の処理）
-                                # -----------------------------
+                                # --------------------------------
+                                # 1) ローカル画像パスで表示(従来処理)
+                                # --------------------------------
                                 image_path = idol["画像パス"]
                                 if os.path.exists(image_path):
                                     st.image(image_path, width=100, use_container_width=False)
@@ -169,12 +169,12 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
                                         unsafe_allow_html=True,
                                     )
                                 else:
-                                    # ローカル画像が無い場合はエラーを出す
                                     st.error(f"画像が見つかりません: {image_path}")
 
-                                # -----------------------------
-                                # 2) 詳細情報（Expander内）に「画像URL」リンクを追加
-                                # -----------------------------
+                                # --------------------------------
+                                # 2) 詳細情報 (Expander) 内で
+                                #    特訓前URL / 特訓後URL を表示
+                                # --------------------------------
                                 with st.expander("詳細"):
                                     st.write(f"**属性**: {idol['属性']}")
                                     st.write(f"**特化**: {idol['特化']}")
@@ -192,14 +192,23 @@ def idol_skill_app(idol_list_path, skill_info_path, idol_name_path):
                                         st.write(f"**副属性**: {idol['副属性']}")
                                         st.write(f"**ドミナント**: {idol['ドミナント']}")
 
-                                    # ▼▼▼ ここで画像URLのリンクを表示 ▼▼▼
-                                    # CSVファイルに "画像URL" カラムがある想定
-                                    image_url = idol.get("画像URL", None)
-                                    if pd.notna(image_url) and str(image_url).strip():
-                                        link_html = f'<a href="{image_url}" target="_blank">➔ 画像URLを開く</a>'
-                                        st.markdown(link_html, unsafe_allow_html=True)
+                                    # =========== 追加部分 ===========
+
+                                    # 特訓前URL
+                                    tokkun_mae_url = idol.get("特訓前URL", None)
+                                    if pd.notna(tokkun_mae_url) and str(tokkun_mae_url).strip():
+                                        link_html_mae = f'<a href="{tokkun_mae_url}" target="_blank">特訓前画像URLを開く</a>'
+                                        st.markdown(link_html_mae, unsafe_allow_html=True)
                                     else:
-                                        st.write("外部画像URLは設定されていません")
+                                        st.write("特訓前画像URLは設定されていません")
+
+                                    # 特訓後URL
+                                    tokkun_ato_url = idol.get("特訓後URL", None)
+                                    if pd.notna(tokkun_ato_url) and str(tokkun_ato_url).strip():
+                                        link_html_ato = f'<a href="{tokkun_ato_url}" target="_blank">特訓後画像URLを開く</a>'
+                                        st.markdown(link_html_ato, unsafe_allow_html=True)
+                                    else:
+                                        st.write("特訓後画像URLは設定されていません")
+
                         else:
                             st.write("該当するアイドルがいません")
-
